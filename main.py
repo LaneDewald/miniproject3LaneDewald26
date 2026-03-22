@@ -133,3 +133,7 @@ def delete_movie(movie_id):
     flash('Movie removed.', 'info')
     return redirect(url_for('watchlist'))
 
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
