@@ -36,13 +36,13 @@
             {% if movie.watched %}Unwatch{% else %}Mark Watched{% endif %}
           </a>
 
-          <!-- Delete button - opens Bootstrap modal -->
-          <button type="button" class="btn btn-sm btn-outline-danger"
-                  data-bs-toggle="modal" data-bs-target="#deleteModal"
-                  data-movie-id="{{ movie.id }}"
-                  data-movie-title="{{ movie.title }}">
-            Delete
-          </button>
+          <!-- Delete -->
+          <form action="{{ url_for('delete_movie', movie_id=movie.id) }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('Delete {{ movie.title }}?')">
+              Delete
+            </button>
+          </form>
         </td>
       </tr>
       {% endfor %}
@@ -53,43 +53,4 @@
   <p class="text-muted">No movies yet. <a href="{{ url_for('add_movie') }}">Add one!</a></p>
 {% endif %}
 
-
-<!-- Bootstrap Modal - Delete Confirmation -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Confirm Delete</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        Are you sure you want to remove <strong id="movieTitle"></strong>?
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <form id="deleteForm" method="POST" action="">
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-      </div>
-
-    </div>
-  </div>
-</div>
-
 {% endblock %}
-
-
-{% block extra_js %}{% endblock %}
-
-<!-- Script to fill in the modal with the right movie -->
-<script>
-  const deleteModal = document.getElementById('deleteModal');
-  deleteModal.addEventListener('show.bs.modal', function(event) {
-    const button = event.relatedTarget;
-    document.getElementById('movieTitle').textContent = button.getAttribute('data-movie-title');
-    document.getElementById('deleteForm').action = '/delete/' + button.getAttribute('data-movie-id');
-  });
-</script>
