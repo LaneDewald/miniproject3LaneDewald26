@@ -78,4 +78,58 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
+@app.route('/watchlist')
+def watchlist():
+    if 'user_id' not in session:
+        flash('Please log in first.', 'warning')
+        return redirect(url_for('login'))
+
+    movies = Movie.query.filter_by(user_id=session['user_id']).all()
+    return render_template('watchlist.html', movies=movies)
+
+
+@app.route('/add', methods=['GET', 'POST'])
+def add_movie():
+    if 'user_id' not in session:
+        flash('Please log in first.', 'warning')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        genre = request.form['genre']
+
+        movie = Movie(title=title, genre=genre, user_id=session['user_id'])
+        db.session.add(movie)
+        db.session.commit()
+        flash(f'"{title}" added!', 'success')
+        return redirect(url_for('watchlist'))
+
+    return render_template('add_movie.html')
+
+
+@app.route('/toggle/<int:movie_id>')
+def toggle_watched(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    movie.watched = not movie.watched
+    db.session.commit()
+    return redirect(url_for('watchlist'))
+
+
+@app.route('/delete/<int:movie_id>', methods=['POST'])
+def delete_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    db.session.delete(movie)
+    db.session.commit()
+    flash('Movie removed.', 'info')
+    return redirect(url_for('watchlist'))
 
